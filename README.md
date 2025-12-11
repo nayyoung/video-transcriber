@@ -1,6 +1,6 @@
-# TikTok Transcriber
+# Video Transcriber
 
-A command-line tool that downloads TikTok videos, extracts audio, and generates transcripts using OpenAI's Whisper model.
+A modular command-line tool that downloads TikTok videos, extracts audio, and generates transcripts using OpenAI's Whisper model.
 
 ## What It Does
 
@@ -38,8 +38,8 @@ sudo apt install ffmpeg python3.12 python3.12-venv
 ### 2. Clone and set up the project
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/tiktok-transcriber.git
-cd tiktok-transcriber
+git clone https://github.com/YOUR_USERNAME/video-transcriber.git
+cd video-transcriber
 
 # Create virtual environment
 python3.12 -m venv venv
@@ -68,7 +68,14 @@ https://www.tiktok.com/@another/video/0987654321
 ### 2. Run the transcriber
 
 ```bash
-python transcribe.py
+# Using the run script
+python run.py
+
+# Or using the module directly
+python -m video_transcriber
+
+# With options
+python -m video_transcriber --model medium --debug
 ```
 
 ### 3. Find your transcripts
@@ -105,32 +112,82 @@ Set the `WHISPER_MODEL` environment variable to choose accuracy vs. speed:
 
 ```bash
 # Use medium model for better accuracy
-WHISPER_MODEL=medium python transcribe.py
+python -m video_transcriber --model medium
+
+# Or with the run script
+WHISPER_MODEL=medium python run.py
 ```
 
 Default is `base` (good balance of speed and accuracy for short TikTok videos).
 
+### Command-Line Options
+
+The transcriber supports various command-line options for customization:
+
+```bash
+python -m video_transcriber [OPTIONS]
+
+Options:
+  --urls FILE           Path to URLs file (default: urls.txt)
+  --model MODEL         Whisper model: tiny, base, small, medium, large (default: base)
+  --video-dir DIR       Directory for videos (default: videos)
+  --audio-dir DIR       Directory for audio (default: audio)
+  --transcript-dir DIR  Directory for transcripts (default: transcripts)
+  --debug               Enable debug logging
+  --help                Show help message
+```
+
+**Examples:**
+```bash
+# Use custom URLs file and medium model
+python -m video_transcriber --urls my_videos.txt --model medium
+
+# Save outputs to custom directories
+python -m video_transcriber --video-dir /tmp/videos --transcript-dir ./output
+
+# Enable debug logging for troubleshooting
+python -m video_transcriber --debug
+```
+
 ## Project Structure
 
 ```
-tiktok-transcriber/
-├── transcribe.py      # Main script
-├── urls.txt           # Your TikTok URLs (one per line)
-├── requirements.txt   # Python dependencies
-├── README.md
-├── .gitignore
-├── videos/            # Downloaded videos (auto-created)
-├── audio/             # Extracted audio (auto-created)
-└── transcripts/       # Output transcripts (auto-created)
+video-transcriber/
+├── src/
+│   └── video_transcriber/      # Main package
+│       ├── __init__.py         # Package initialization
+│       ├── __main__.py         # CLI entry point
+│       ├── config.py           # Configuration management
+│       ├── downloader.py       # Video downloading
+│       ├── audio.py            # Audio extraction
+│       ├── transcriber.py      # Transcription logic
+│       ├── processor.py        # Main orchestration
+│       ├── utils.py            # Utility functions
+│       └── exceptions.py       # Custom exceptions
+├── run.py                      # Convenience entry point
+├── urls.txt                    # Your TikTok URLs (one per line)
+├── requirements.txt            # Python dependencies
+├── pyproject.toml              # Project configuration
+├── README.md                   # This file
+├── LICENSE                     # MIT License
+├── .gitignore                  # Git ignore patterns
+├── videos/                     # Downloaded videos (auto-created)
+├── audio/                      # Extracted audio (auto-created)
+└── transcripts/                # Output transcripts (auto-created)
 ```
 
 ## Features
 
+- **Modular architecture**: Clean separation of concerns with dedicated modules
+- **Command-line interface**: Rich CLI with argument parsing and help
 - **Smart filenames**: Files are named using creator + title + video ID instead of generic numbers
 - **Skip existing**: Re-running won't re-process videos that already have transcripts
 - **Metadata preservation**: Each transcript includes view count, likes, duration, and source URL
 - **Error handling**: Failed downloads don't stop the batch; you get a summary at the end
 - **Timeout protection**: Long-running downloads or transcriptions are killed to prevent hangs
+- **Proper logging**: Structured logging with configurable levels (INFO/DEBUG)
+- **Type hints**: Full type annotations for better code quality
+- **Configurable**: Environment variables and CLI arguments for flexibility
 
 ## Troubleshooting
 
