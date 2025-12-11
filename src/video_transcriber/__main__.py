@@ -5,12 +5,6 @@ import logging
 import sys
 from pathlib import Path
 
-try:
-    import whisper
-except ImportError:
-    print("Error: openai-whisper not installed. Run: pip install openai-whisper")
-    sys.exit(1)
-
 from .audio import AudioExtractor
 from .config import TranscriberConfig
 from .downloader import VideoDownloader
@@ -131,8 +125,12 @@ def main() -> int:
     # Load Whisper model
     logger.info(f"Loading Whisper model ({config.whisper_model})...")
     try:
+        import whisper
         model = whisper.load_model(config.whisper_model)
         logger.info("Model loaded successfully")
+    except ImportError:
+        logger.error("Error: openai-whisper not installed. Run: pip install openai-whisper")
+        return 1
     except Exception as e:
         logger.error(f"Failed to load Whisper model: {e}")
         return 1
