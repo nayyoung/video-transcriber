@@ -1,0 +1,7 @@
+# TikTok URLs to transcribe
+# Add one URL per line
+# Lines starting with # are ignored
+
+# Example:
+# https://www.tiktok.com/@username/video/1234567890123456789
+
